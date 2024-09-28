@@ -59,8 +59,14 @@ public class CSVDataGather {
     matchups = matchupManager.extractAllMatchups(matchupsCSVPath);
   }
 
+  /**
+   * Creates a specific matchup based on the game ID.
+   * @param folderPath Pathway to find the desiredFile in
+   * @param gameID ID of game looking to create
+   * @param desiredFile File to look into for gameID
+   * @return Matchup object of desired matchup.
+   */
     public Matchup curateSpecificPlay(String folderPath, int gameID, String desiredFile) {
-//      Matchup matchup = generateSpecificMatchupPlays(playByPlayCSVPath, gameID, true, desiredFile, matchups);
       File[] files = new File(folderPath).listFiles((dir, name) -> name.toLowerCase().endsWith(".csv"));
       Matchup matchup = null;
 
@@ -104,9 +110,7 @@ public class CSVDataGather {
         }
       }
       }
-
-    // Finalize plays for all matchups
-//    matchups.forEach(this::finalizeMatchup);
+    System.out.println("Finished Processing");
   }
 
 
@@ -130,7 +134,6 @@ public class CSVDataGather {
         String date = CSVUtils.getDate(csvRecord);
         String awayPlayer = getCorrectedAwayPlayer(csvRecord);
         int gameID = CSVUtils.getGameID(csvRecord);
-
         // Find corresponding matchup for the record
         matchup = findCorrelatingMatchupWithID(date, awayPlayer, matchups, gameID);
         if (currentMatchup == null && matchup != null){
@@ -198,6 +201,8 @@ public class CSVDataGather {
       if (matchup != null){
         finalizeMatchup(matchup);
         return matchup;
+      }else{
+        System.out.println("Failed to find Matchup with ID: " + desiredGameID);
       }
 
     } catch (IOException e) {
@@ -309,7 +314,16 @@ public class CSVDataGather {
     matchup.getPlayByPlays().add(play);
   }
 
-
+  /**
+   * Loops through matchups List, checks to see if that matchup has already been discovered, meaning it has a paired Game ID, and returns the desired matchup.
+   * If a Game ID has not been set, it checks to see if the date parameter matches with the CSV line, and if so, checks to see if there contains as player name similar to the one in the matchup csv.
+   * If so, it will recognize the matchup and return the matchup object.
+   * @param date Date to look for.
+   * @param name Name of player to check if existing in the processedCsv
+   * @param matchups Matchups List to loop through
+   * @param id ID of game wanted for Matchup Object
+   * @return Returns desired Matchup.
+   */
   private Matchup findCorrelatingMatchupWithID(
       String date, String name, List<Matchup> matchups, int id) {
     for (Matchup matchup : matchups) {
@@ -395,6 +409,11 @@ public class CSVDataGather {
     return count;
   }
 
+
+  /**
+   * Sorts the matchups from farthest date to most recent date. (e.g. 2014 To 2024)
+   * @return Returns the list of sorted matchups.
+   */
   public List<Matchup> gatherAndOrganizeMatchups(){
       matchups.sort((m1, m2) -> {
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
