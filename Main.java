@@ -7,7 +7,7 @@ import me.antcode.managers.PlayLabellingManager;
 import java.util.List;
 
 public class Main {
- static String[] fileNames = new String[]{"[03-05-2016]-[06-19-2016]-combined-stats.csv"};
+ static String[] fileNames = new String[]{"[10-24-2023]-[06-17-2024]-combined-stats.csv"};
 
   public static void main(String[] args) {
     // TIME DISCREPANCY IS BECAUSE FROM SECOND LAST TO LAST PLAY IS NOT REGISTERED MEANING YOU LOSE
@@ -27,20 +27,29 @@ public class Main {
     TestPlayerStats testPlayerStats = new TestPlayerStats();
     PlayLabellingManager playLabellingManager = new PlayLabellingManager();
 
+    allMatchups = csvDataGather.gatherAndOrganizeMatchups();
 
+    //Loads the teambox.csv and preps it for future player stat comparison
     testPlayerStats.loadCSV();
 
+    //Loads All matchup objects(meaning the plays as well), depending on if you want to access specific Files.
+    generatePlaysForMatchups(csvDataGather, playByPlayPath, fileNames, true);
 
-    allMatchups = csvDataGather.gatherAndOrganizeMatchups();
-    generatePlaysForMatchups(csvDataGather, playByPlayPath,
-            fileNames, false);
+    //Prints the specific matchup object
+ // printSpecificMatchup( playByPlayPath,testPlayerStats, csvDataGather, 22301071, "[10-24-2023]-[06-17-2024]-combined-stats.csv", playLabellingManager, allMatchups);
 
-//   printSpecificMatchup( playByPlayPath,testPlayerStats, csvDataGather, 22301071, "[10-24-2023]-[06-17-2024]-combined-stats.csv", playLabellingManager, allMatchups);
-    comparePlayerStats(testPlayerStats,allMatchups); //comment this out when checking a specific game
+      //Generates a specific matchup object(meaning the plays as well)
+// generateSpecificMatchup(playByPlayPath, csvDataGather, 22100641,"[10-24-2023]-[06-17-2024]-combined-stats.csv");
 
-    printNonMatchingPlayerStats(testPlayerStats);
+      //Compares player stats generated with teambox.csv . Make sure csv Is loaded in, and you generate complete matchup objects.
+ //   comparePlayerStats(testPlayerStats,allMatchups); //comment this out when checking a specific game
 
-    generateStatistics(testPlayerStats, csvDataGather);
+      //Prints non matching stats from teambox.csv
+  // printNonMatchingPlayerStats(testPlayerStats);
+
+   // generateStatistics(testPlayerStats, csvDataGather);
+
+   //   deployDataCSV(allMatchups);
   }
 
   private static void generatePlaysForMatchups(CSVDataGather csvDataGather, String playByPlayPath, String[] fileName, boolean accessSpecificFile){
@@ -49,6 +58,10 @@ public class Main {
 
   private static void printSpecificMatchup(String folderPath, TestPlayerStats testPlayerStats, CSVDataGather csvDataGather, int gameID, String fileName, PlayLabellingManager playLabellingManager, List<Matchup> allMatchups){
        playLabellingManager.printSpecificMatchup(folderPath, testPlayerStats, csvDataGather, gameID, fileName, allMatchups);
+  }
+
+  private static Matchup generateSpecificMatchup(String folderPath, CSVDataGather csvDataGather, int gameID, String fileName){
+    return   csvDataGather.curateSpecificPlay(folderPath, gameID, fileName);
   }
 
 
